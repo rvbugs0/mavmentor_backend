@@ -141,11 +141,12 @@ class UserController extends Controller
             $user = User::create([
                 'email' => $email,
                 'password' => Hash::make($newPassword),
+                'role'=>2
             ]);
 
             // Send email with the new password
             $this->sendPasswordEmail($user->email, $newPassword);
-            return response()->json(['success' => true, 'exists' => $userExists], 200);
+            return response()->json(['success' => false, 'message' => "Password sent to your email. Retry logging in."], 200);
         }
 
 
