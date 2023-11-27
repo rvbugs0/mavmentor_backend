@@ -115,9 +115,12 @@ class UserController extends Controller
 
     public function checkUserExists(Request $request)
     {
-        $request->validate([
-            'email' => 'required|email',
-        ]);
+        $email = $request->input('email');
+
+        if (!$email) {
+            // If email parameter is not present in the request
+            return response()->json(['error' => 'Email parameter is required'], 400);
+        }
 
         $userExists = User::where('email', $request->email)->exists();
 
