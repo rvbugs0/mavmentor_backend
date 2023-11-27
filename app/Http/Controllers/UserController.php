@@ -44,20 +44,26 @@ class UserController extends Controller
 
     public function authenticate(Request $request)
     {
-        $request->validate([
-            'email' => 'required|email',
-            'password' => 'required',
-        ]);
+        $email = $request->input('email');
+        $password = $request->input('password');
 
+        if (!$email) {
+            // If email parameter is not present in the request
+            return response()->json(['success' => false, 'message' => 'Email parameter is required'], 200);
+        }
+        if (!$password) {
+            // If email parameter is not present in the request
+            return response()->json(['success' => false, 'message' => 'Password parameter is required'], 200);
+        }
         $credentials = $request->only('email', 'password');
 
         if (Auth::attempt($credentials)) {
             // Authentication passed
             $user = Auth::user();
-            return response()->json(['message' => 'Authentication successful', 'user' => $user], 200);
+            return response()->json(['success,'=>true,'message' => 'Authentication successful', 'user' => $user], 200);
         } else {
             // Authentication failed
-            return response()->json(['message' => 'Invalid credentials'], 401);
+            return response()->json(['success,'=>false,'message' => 'Invalid credentials'],200);
         }
     }
 

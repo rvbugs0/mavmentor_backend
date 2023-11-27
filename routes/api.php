@@ -36,6 +36,6 @@ Route::get('/quiz-play/{userId}/{quizId}/unanswered-questions', [QuizPlayControl
 Route::get('/quiz-play/{userId}/calculate-score', [QuizPlayController::class, 'calculateScore']);
 Route::delete('/quiz-play/{userId}/{quizId}/reset-quiz', [QuizPlayController::class, 'resetQuiz']);
 Route::post('/user-exists', [UserController::class, 'generatePassword']);
-Route::post('/authenticate', [UserController::class, 'authenticate']);
 
+Route::post('/authenticate', [UserController::class, 'authenticate']);
 Route::get('/check-user-exists', [UserController::class, 'checkUserExists']);
