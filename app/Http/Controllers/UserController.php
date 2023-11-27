@@ -55,15 +55,15 @@ class UserController extends Controller
             // If email parameter is not present in the request
             return response()->json(['success' => false, 'message' => 'Password parameter is required'], 200);
         }
-        $credentials = $request->only('email', 'password');
+        $user = User::where('email', $email)->first();
 
-        if (Auth::attempt($credentials)) {
+        if ($user && Hash::check($password, $user->password)) {
             // Authentication passed
-            $user = Auth::user();
-            return response()->json(['success'=>true,'message' => 'Authentication successful', 'user' => $user], 200);
+
+            return response()->json(['success' => true, 'message' => 'Authentication successful', 'user' => $user], 200);
         } else {
             // Authentication failed
-            return response()->json(['success'=>false,'message' => 'Invalid credentials'],200);
+            return response()->json(['success' => false, 'message' => 'Invalid credentials'], 200);
         }
     }
 
@@ -146,7 +146,7 @@ class UserController extends Controller
             $user = User::create([
                 'email' => $email,
                 'password' => Hash::make($newPassword),
-                'role'=>2
+                'role' => 2
             ]);
 
             // Send email with the new password
