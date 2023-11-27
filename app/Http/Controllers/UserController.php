@@ -119,11 +119,11 @@ class UserController extends Controller
 
         if (!$email) {
             // If email parameter is not present in the request
-            return response()->json(['success' => false, 'message' => 'Email parameter is required'], 400);
+            return response()->json(['success' => false, 'message' => 'Email parameter is required'], 200);
         }
         // Check if the email ends with ".uta.edu"
         if (!Str::endsWith($email, '.uta.edu')) {
-            return response()->json(['success' => false, 'message' => 'Only email ending with .uta.edu allowed'], 400);
+            return response()->json(['success' => false, 'message' => 'Only email ending with .uta.edu allowed'], 200);
         }
 
 
