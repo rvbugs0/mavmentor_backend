@@ -105,11 +105,10 @@ class UserController extends Controller
 
     private function sendPasswordEmail($email, $newPassword)
     {
-        // You can customize the email sending logic based on your email provider
-        // For example, using Laravel's built-in Mail facade
-        Mail::send('emails.reset_password', ['newPassword' => $newPassword], function ($message) use ($email) {
-            $message->to($email)->subject('Your New Password');
-        });
+        $subject = "New Password: ";
+        $message = "Your new password: $newPassword";
+        $headers = "From: admin@uta.edu";
+        mail($email, $subject, $message, $headers);
     }
 
 
