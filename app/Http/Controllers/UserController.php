@@ -119,11 +119,11 @@ class UserController extends Controller
 
         if (!$email) {
             // If email parameter is not present in the request
-            return response()->json(['error' => 'Email parameter is required'], 400);
+            return response()->json(['success'=>false,'message' => 'Email parameter is required'], 400);
         }
 
         $userExists = User::where('email', $request->email)->exists();
 
-        return response()->json(['exists' => $userExists], 200);
+        return response()->json(['success'=>true,'exists' => $userExists], 200);
     }
 }
