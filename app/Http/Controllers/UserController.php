@@ -64,10 +64,10 @@ class UserController extends Controller
 
     public function generatePassword(Request $request)
     {   // Validate the request
-         // Validate the request
-         $request->validate([
+        // Validate the request
+        $request->validate([
             'email' => 'required|email',
-            
+
             'first_name' => 'nullable|string',
             'last_name' => 'nullable|string',
             'phone' => 'nullable|string',
@@ -83,7 +83,7 @@ class UserController extends Controller
                 $user = User::create([
                     'email' => $request->email,
                     'password' => Hash::make(Str::random(10)),
-                    'role'=>2
+                    'role' => 2
                 ]);
             }
 
@@ -119,11 +119,37 @@ class UserController extends Controller
 
         if (!$email) {
             // If email parameter is not present in the request
-            return response()->json(['success'=>false,'message' => 'Email parameter is required'], 400);
+            return response()->json(['success' => false, 'message' => 'Email parameter is required'], 400);
+        }
+        // Check if the email ends with ".uta.edu"
+        if (!Str::endsWith($email, '.uta.edu')) {
+            return response()->json(['success' => false, 'message' => 'Only email ending with .uta.edu allowed'], 400);
         }
 
-        $userExists = User::where('email', $request->email)->exists();
 
-        return response()->json(['success'=>true,'exists' => $userExists], 200);
+        $userExists = User::where('email', $request->email)->exists();
+        if ($userExists) {
+            return response()->json(['success' => true, 'exists' => $userExists], 200);
+        } else {
+
+
+
+            // User does not exist, create a password
+            $newPassword = Str::random(10);
+
+            // Create a new user
+            $user = User::create([
+                'email' => $email,
+                'password' => Hash::make($newPassword),
+            ]);
+
+            // Send email with the new password
+            $this->sendPasswordEmail($user->email, $newPassword);
+            return response()->json(['success' => true, 'exists' => $userExists], 200);
+        }
+
+
+
     }
+
 }
