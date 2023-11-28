@@ -59,9 +59,12 @@ class QuizPlayController extends Controller
 
             $userId = $request->input('user_id');
             $quizId = $request->input('quiz_id');
-            $total_questions = $this->getQuestionsByQuizId($quizId)->count();
+            $all_questions = $this->getQuestionsByQuizId($quizId);
+            $total_questions = $all_questions->count();
             // Get all answered questions for the specified user
-            $answeredQuestions = AnsweredQuestion::where(['user_id'=> $userId,'quiz_id'=>$quizId])->get();
+            
+            $questionIds = $all_questions->pluck('id')->toArray();
+            $answeredQuestions = AnsweredQuestion::where('user_id',$userId)->whereIn('question_id', $questionIds)->get();
     
             // Calculate the score based on correct and incorrect answers
             $score = $answeredQuestions->reduce(function ($carry, $answeredQuestion) {
