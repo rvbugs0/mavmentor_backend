@@ -12,4 +12,9 @@ class Quiz extends Model
     protected $fillable = [
         'title', 'location', 'expires_at',
     ];
+
+    public function setExpiresAtAttribute($value)
+    {
+        $this->attributes['expires_at'] = \Carbon\Carbon::parse($value);
+    }
 }
