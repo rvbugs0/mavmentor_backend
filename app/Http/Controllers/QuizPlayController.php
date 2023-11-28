@@ -80,7 +80,7 @@ class QuizPlayController extends Controller
     
     
     
-            return response()->json(['success'=>true,'score' => 10]);
+            return response()->json(['success'=>true,'score' => ($score*100/$total_questions)]);
 
         }else{
             return response()->json(['success'=>false,'message' => 'USERID or QUIZ ID not provided']);
