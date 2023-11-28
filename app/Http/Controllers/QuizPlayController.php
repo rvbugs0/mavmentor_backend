@@ -60,7 +60,9 @@ class QuizPlayController extends Controller
             $userId = $request->input('user_id');
             $quizId = $request->input('quiz_id');
             $all_questions = $this->getQuestionsByQuizId($quizId);
-            $total_questions = $all_questions->count();
+            
+            // to prevent divide by 0 error
+            $total_questions = max($all_questions->count(), 0.00001);
             // Get all answered questions for the specified user
             
             $questionIds = $all_questions->pluck('id')->toArray();
