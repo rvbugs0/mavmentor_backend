@@ -8,9 +8,18 @@ class QuizController extends Controller
 {
     //
 
-    public function index()
+    public function index(Request $request)
     {
-        return Quiz::all();
+           // Check if the 'location' attribute is present in the request
+           if ($request->has('location')) {
+            // Retrieve quizzes based on the 'location' attribute
+            $quizzes = Quiz::where('location', $request->input('location'))->get();
+        } else {
+            // If 'location' is not provided, retrieve all quizzes
+            $quizzes = [];
+        }
+
+        return $quizzes;
     }
 
     public function show($id)
@@ -38,4 +47,7 @@ class QuizController extends Controller
 
         return 204;
     }
+
+
+
 }

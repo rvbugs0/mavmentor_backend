@@ -45,22 +45,44 @@ class QuizPlayController extends Controller
         return $unansweredQuestions;
     }
 
-    public function calculateScore($userId)
+    public function getQuestionsByQuizId($quizId)
     {
-        // Get all answered questions for the specified user
-        $answeredQuestions = AnsweredQuestion::where('user_id', $userId)->get();
+        // Retrieve all questions for a specific quiz ID
+        $questions = QuestionBank::where('quiz_id', $quizId)->get();
 
-        // Calculate the score based on correct and incorrect answers
-        $score = $answeredQuestions->reduce(function ($carry, $answeredQuestion) {
-            // If the selected answer is the correct answer, add 1 to the score
-            if ($answeredQuestion->selected_answer === $answeredQuestion->question->answer) {
-                return $carry + 1;
-            }
-            // Otherwise, the answer is incorrect, so the score remains unchanged
-            return $carry;
-        }, 0);
+        return $questions;
+    }
 
-        return ['score' => $score];
+    public function calculateScore(Request $request)
+    {
+        if($request->has('user_id') && $request->has('quiz_id')){
+
+            $userId = $request->input('user_id');
+            $quizId = $request->input('quiz_id');
+            $total_questions = $this->getQuestionsByQuizId($quizId)->count();
+            // Get all answered questions for the specified user
+            $answeredQuestions = AnsweredQuestion::where(['user_id'=> $userId,'quiz_id'=>$quizId])->get();
+    
+            // Calculate the score based on correct and incorrect answers
+            $score = $answeredQuestions->reduce(function ($carry, $answeredQuestion) {
+                // If the selected answer is the correct answer, add 1 to the score
+                if ($answeredQuestion->selected_answer === $answeredQuestion->question->answer) {
+                    return $carry + 1;
+                }
+                // Otherwise, the answer is incorrect, so the score remains unchanged
+                return $carry;
+            }, 0);
+    
+    
+    
+            return response()->json(['success'=>true,'score' => ($score*100/$total_questions)]);
+
+        }else{
+            return response()->json(['success'=>false,'message' => 'USERID or QUIZ ID not provided']);
+        }
+        
+
+
     }
 
     public function resetQuiz($userId, $quizId)
