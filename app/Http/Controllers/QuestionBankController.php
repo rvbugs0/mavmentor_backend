@@ -13,6 +13,8 @@ class QuestionBankController extends Controller
         return QuestionBank::all();
     }
 
+    
+
     public function show($id)
     {
         return QuestionBank::find($id);

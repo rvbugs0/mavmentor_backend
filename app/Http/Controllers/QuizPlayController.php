@@ -12,11 +12,17 @@ class QuizPlayController extends Controller
 
     public function submitAnswer(Request $request)
     {
-        $request->validate([
-            'user_id' => 'required|exists:users,id',
-            'question_id' => 'required|exists:questions,id',
-            'selected_answer' => 'required|integer|between:1,4', // Assuming selected_answer is an integer between 1 and 4
-        ]);
+        // $request->validate([
+        //     'user_id' => 'required|exists:users,id',
+        //     'question_id' => 'required|exists:questions,id',
+        //     'selected_answer' => 'required|integer|between:1,4', // Assuming selected_answer is an integer between 1 and 4
+        // ]);
+
+        if(!($request->has('user_id') && $request->has('question_id') && $request->has('selected_answer')))
+        {
+            return response()->json(['success'=>false,'message' => 'Parameters missing'], 200);
+
+        }
 
         AnsweredQuestion::create([
             'user_id' => $request->user_id,
@@ -24,7 +30,7 @@ class QuizPlayController extends Controller
             'selected_answer' => $request->selected_answer,
         ]);
 
-        return response()->json(['message' => 'User answer recorded successfully'], 201);
+        return response()->json(['success'=>true,'message' => 'User answer recorded successfully'], 200);
     }
     //
     public function getUnansweredQuestions(Request $request)
