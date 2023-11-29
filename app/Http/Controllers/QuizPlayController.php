@@ -18,19 +18,31 @@ class QuizPlayController extends Controller
         //     'selected_answer' => 'required|integer|between:1,4', // Assuming selected_answer is an integer between 1 and 4
         // ]);
 
-        if(!($request->has('user_id') && $request->has('question_id') && $request->has('selected_answer')))
-        {
-            return response()->json(['success'=>false,'message' => 'Parameters missing'], 200);
+        if (!($request->has('user_id') && $request->has('question_id') && $request->has('selected_answer'))) {
+            return response()->json(['success' => false, 'message' => 'Parameters missing'], 200);
 
         }
 
-        AnsweredQuestion::create([
-            'user_id' => $request->user_id,
-            'question_id' => $request->question_id,
-            'selected_answer' => $request->selected_answer,
-        ]);
+        // AnsweredQuestion::create([
+        //     'user_id' => $request->user_id,
+        //     'question_id' => $request->question_id,
+        //     'selected_answer' => $request->selected_answer,
+        // ]);
+        try {
+            AnsweredQuestion::firstOrCreate(
+                [
+                    'user_id' => $request->user_id,
+                    'question_id' => $request->question_id,
+                ],
+                [
+                    'selected_answer' => $request->selected_answer,
+                ]
+            );
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => 'Error processing the request'], 200);
+        }
 
-        return response()->json(['success'=>true,'message' => 'User answer recorded successfully'], 200);
+        return response()->json(['success' => true, 'message' => 'User answer recorded successfully'], 200);
     }
     //
     public function getUnansweredQuestions(Request $request)
@@ -54,7 +66,7 @@ class QuizPlayController extends Controller
 
             return response()->json($unansweredQuestions);
 
-        }else{
+        } else {
             return response()->json([]);
         }
     }
