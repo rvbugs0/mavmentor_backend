@@ -117,8 +117,12 @@ class QuizPlayController extends Controller
 
     }
 
-    public function resetQuiz($userId, $quizId)
+    public function resetQuiz(Request $request)
     {
+        if ($request->has('user_id') && $request->has('quiz_id')) {
+
+            $userId = $request->input('user_id');
+            $quizId = $request->input('quiz_id');
         // Delete all answered questions for the specified user and quiz
         AnsweredQuestion::where('user_id', $userId)
             ->whereHas('question', function ($query) use ($quizId) {
@@ -126,6 +130,13 @@ class QuizPlayController extends Controller
             })
             ->delete();
 
-        return response()->json(['message' => 'Quiz reset successfully'], 200);
+        return response()->json(['success'=> true,'message' => 'Quiz reset successfully'], 200);
+
+        }else{
+            return response()->json(['success'=> false,'message' => 'Parameters missing'], 200);
+
+        }
+
+
     }
 }

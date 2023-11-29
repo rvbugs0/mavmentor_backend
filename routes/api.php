@@ -45,3 +45,6 @@ Route::get('/get-quiz-score', [QuizPlayController::class, 'calculateScore']);
 Route::get('/get-questions', [QuizPlayController::class, 'getUnansweredQuestions']);
 
 Route::post('/submit-answer', [QuizPlayController::class, 'submitAnswer']);
+
+
+Route::post('/reset-quiz', [QuizPlayController::class, 'resetQuiz']);
