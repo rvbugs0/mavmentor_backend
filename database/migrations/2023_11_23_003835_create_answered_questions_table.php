@@ -15,6 +15,9 @@ return new class extends Migration
             $table->foreign('question_id')->references('id')->on('question_banks');
             $table->tinyInteger('selected_answer')->unsigned()->between(1, 4);
             $table->timestamps();
+
+            $table->unique(['user_id', 'question_id']);
+
         });
     }
 
