@@ -27,22 +27,30 @@ class QuizPlayController extends Controller
         return response()->json(['message' => 'User answer recorded successfully'], 201);
     }
     //
-    public function getUnansweredQuestions($userId, $quizId)
+    public function getUnansweredQuestions(Request $request)
     {
-        // Get all questions for the specified quiz
-        $quizQuestions = QuestionBank::where('quiz_id', $quizId)->get();
+        if ($request->has('user_id') && $request->has('quiz_id')) {
 
-        // Get the IDs of questions that the user has already answered
-        $answeredQuestionIds = AnsweredQuestion::where('user_id', $userId)
-            ->where('question_id', $quizQuestions->pluck('id')->toArray())
-            ->pluck('question_id');
+            $userId = $request->input('user_id');
+            $quizId = $request->input('quiz_id');
+            // Get all questions for the specified quiz
+            $quizQuestions = QuestionBank::where('quiz_id', $quizId)->get();
 
-        // Filter out questions that the user has already answered
-        $unansweredQuestions = $quizQuestions->reject(function ($question) use ($answeredQuestionIds) {
-            return in_array($question->id, $answeredQuestionIds->toArray());
-        });
+            // Get the IDs of questions that the user has already answered
+            $answeredQuestionIds = AnsweredQuestion::where('user_id', $userId)
+                ->where('question_id', $quizQuestions->pluck('id')->toArray())
+                ->pluck('question_id');
 
-        return $unansweredQuestions;
+            // Filter out questions that the user has already answered
+            $unansweredQuestions = $quizQuestions->reject(function ($question) use ($answeredQuestionIds) {
+                return in_array($question->id, $answeredQuestionIds->toArray());
+            });
+
+            return response()->json($unansweredQuestions);
+
+        }else{
+            return response()->json([]);
+        }
     }
 
     public function getQuestionsByQuizId($quizId)
@@ -55,19 +63,19 @@ class QuizPlayController extends Controller
 
     public function calculateScore(Request $request)
     {
-        if($request->has('user_id') && $request->has('quiz_id')){
+        if ($request->has('user_id') && $request->has('quiz_id')) {
 
             $userId = $request->input('user_id');
             $quizId = $request->input('quiz_id');
             $all_questions = $this->getQuestionsByQuizId($quizId);
-            
+
             // to prevent divide by 0 error
             $total_questions = max($all_questions->count(), 0.00001);
             // Get all answered questions for the specified user
-            
+
             $questionIds = $all_questions->pluck('id')->toArray();
-            $answeredQuestions = AnsweredQuestion::where('user_id',$userId)->whereIn('question_id', $questionIds)->get();
-    
+            $answeredQuestions = AnsweredQuestion::where('user_id', $userId)->whereIn('question_id', $questionIds)->get();
+
             // Calculate the score based on correct and incorrect answers
             $score = $answeredQuestions->reduce(function ($carry, $answeredQuestion) {
                 // If the selected answer is the correct answer, add 1 to the score
@@ -77,15 +85,15 @@ class QuizPlayController extends Controller
                 // Otherwise, the answer is incorrect, so the score remains unchanged
                 return $carry;
             }, 0);
-    
-    
-    
-            return response()->json(['success'=>true,'score' => ($score*100/$total_questions)]);
 
-        }else{
-            return response()->json(['success'=>false,'message' => 'USERID or QUIZ ID not provided']);
+
+
+            return response()->json(['success' => true, 'score' => ($score * 100 / $total_questions)]);
+
+        } else {
+            return response()->json(['success' => false, 'message' => 'USERID or QUIZ ID not provided']);
         }
-        
+
 
 
     }

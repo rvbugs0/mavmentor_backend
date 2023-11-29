@@ -41,3 +41,6 @@ Route::post('/authenticate', [UserController::class, 'authenticate']);
 Route::get('/check-user-exists', [UserController::class, 'checkUserExists']);
 
 Route::get('/get-quiz-score', [QuizPlayController::class, 'calculateScore']);
+
+Route::get('/get-questions', [QuizPlayController::class, 'getUnansweredQuestions']);
+
