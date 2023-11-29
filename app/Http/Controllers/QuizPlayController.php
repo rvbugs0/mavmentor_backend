@@ -48,24 +48,25 @@ class QuizPlayController extends Controller
     public function getUnansweredQuestions(Request $request)
     {
         if ($request->has('user_id') && $request->has('quiz_id')) {
-
+    
             $userId = $request->input('user_id');
             $quizId = $request->input('quiz_id');
+    
             // Get all questions for the specified quiz
             $quizQuestions = QuestionBank::where('quiz_id', $quizId)->get();
-
+    
             // Get the IDs of questions that the user has already answered
             $answeredQuestionIds = AnsweredQuestion::where('user_id', $userId)
-                ->where('question_id', $quizQuestions->pluck('id')->toArray())
+                ->whereIn('question_id', $quizQuestions->pluck('id'))
                 ->pluck('question_id');
-
+    
             // Filter out questions that the user has already answered
             $unansweredQuestions = $quizQuestions->reject(function ($question) use ($answeredQuestionIds) {
-                return in_array($question->id, $answeredQuestionIds->toArray());
+                return $answeredQuestionIds->contains($question->id);
             });
-
+    
             return response()->json($unansweredQuestions);
-
+    
         } else {
             return response()->json([]);
         }
